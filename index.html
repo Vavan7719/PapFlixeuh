@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PapFlixeuh</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #141414;
+      color: white;
+    }
+
+    .section {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .active {
+      display: flex;
+    }
+
+    .profile-selection {
+      flex-wrap: wrap;
+      gap: 30px;
+    }
+
+    .profile-card {
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .profile-card:hover {
+      transform: scale(1.05);
+    }
+
+    .profile-card img {
+      width: 150px;
+      height: 150px;
+      border-radius: 15px;
+      object-fit: cover;
+      border: 4px solid white;
+    }
+
+    .profile-card h2 {
+      margin-top: 10px;
+      font-size: 1.2rem;
+    }
+
+    .movie-card {
+      max-width: 1000px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .movie-card img {
+      width: 100%;
+      max-height: 500px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .movie-card h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .movie-card p {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #ccc;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .buttons button {
+      background-color: #e50914;
+      border: none;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .buttons button:hover {
+      background-color: #b00610;
+    }
+
+    #videoModal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    #videoModal video {
+      max-width: 90%;
+      max-height: 80%;
+    }
+
+    #videoModal button {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2rem;
+      background: none;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .profile-info {
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      font-size: 1.2rem;
+      font-style: italic;
+      color: #aaa;
+    }
+
+    .notif {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: rgba(0,0,0,0.8);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      z-index: 99999;
+    }
+
+    .notif.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    /* Info Pop-up */
+    .info-popup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+
+    .info-content {
+      background-color: #222;
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 400px;
+      position: relative;
+      font-size: 1.1rem;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+
+    .info-content .close-btn {
+      position: absolute;
+      top: 10px; right: 15px;
+      background: none;
+      color: white;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sélection de profil -->
+  <div class="section profile-selection active" id="profilePage">
+    <div class="profile-card" onclick="selectProfile('Super Papa', 'super.jpg')">
+      <img src="super.jpg" alt="Super Papa">
+      <h2>Super Papa 🦸‍♂️</h2>
+    </div>
+    <div class="profile-card" onclick="selectProfile('Roi du Barbecue', 'bbq.jpg')">
+      <img src="bbq.jpg" alt="Roi du Barbecue">
+      <h2>Roi du Barbecue 🍖</h2>
+    </div>
+    <div class="profile-card" onclick="selectProfile('Héros du Quotidien', 'hero.jpg')">
+      <img src="hero.jpg" alt="Héros du Quotidien">
+      <h2>Héros du Quotidien 🛠️</h2>
+    </div>
+    <div class="profile-card" onclick="selectProfile('Papa enfaite', 'papa.jpg')">
+      <img src="papa.jpg" alt="Papa">
+      <h2>Papa enfaite</h2>
+    </div>
+  </div>
+
+  <!-- Bibliothèque -->
+  <div class="section library" id="libraryPage">
+    <div class="profile-info" id="selectedProfileName">Profil : ???</div>
+    <div class="movie-card">
+      <img src="image_film.jpg" alt="Affiche du film">
+      <h1 id="filmTitle">Un Film Pour Papa</h1>
+      <p id="filmDesc">Un papa formidable, toujours là avec le sourire et un cœur immense.</p>
+      <div class="buttons">
+        <button onclick="launchFilm()">▶ Lancer</button>
+        <button onclick="addToList()">+ Ajouter à la liste</button>
+        <button onclick="likeFilm()">❤️ Liker</button>
+        <button onclick="moreInfo()">ℹ Plus d'infos</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale vidéo -->
+  <div id="videoModal">
+    <button onclick="closeVideo()">✖</button>
+    <video id="filmVideo" controls autoplay>
+      <source src="film.mp4" type="video/mp4">
+      Votre navigateur ne supporte pas la vidéo.
+    </video>
+  </div>
+
+  <!-- Notification -->
+  <div class="notif" id="notifBox"></div>
+
+  <!-- Pop-up Info -->
+  <div class="info-popup" id="infoPopup">
+    <div class="info-content">
+      <button class="close-btn" onclick="closeInfoPopup()">✖</button>
+      <p>Mon père est un pilier dans ma vie — un homme généreux, drôle et profondément aimant. Toujours prêt à rendre service, à écouter, à conseiller, il incarne la force tranquille et le cœur chaleureux. Que ce soit autour d’un bon barbecue, devant un film ou dans les petits moments du quotidien, il sait rendre chaque instant précieux. C’est un héros discret, mais un héros tout de même. ❤️</p>
+    </div>
+  </div>
+
+  <script>
+    let selectedProfile = null;
+
+    function selectProfile(name, img) {
+      selectedProfile = name;
+      document.getElementById('profilePage').classList.remove('active');
+      document.getElementById('libraryPage').classList.add('active');
+      document.getElementById('selectedProfileName').textContent = "Profil : " + name;
+    }
+
+    function launchFilm() {
+      document.getElementById('videoModal').style.display = 'flex';
+      document.getElementById('filmVideo').play();
+    }
+
+    function closeVideo() {
+      const video = document.getElementById('filmVideo');
+      video.pause();
+      video.currentTime = 0;
+      document.getElementById('videoModal').style.display = 'none';
+    }
+
+    function showNotif(message) {
+      const notif = document.getElementById('notifBox');
+      notif.textContent = message;
+      notif.classList.add('show');
+      setTimeout(() => notif.classList.remove('show'), 3000);
+    }
+
+    function hideNotif() {
+      document.getElementById('notifBox').classList.remove('show');
+    }
+
+    function addToList() {
+      const title = document.getElementById('filmTitle').textContent;
+      let list = JSON.parse(localStorage.getItem('myList')) || [];
+      if (!list.includes(title)) {
+        list.push(title);
+        localStorage.setItem('myList', JSON.stringify(list));
+        showNotif('Ajouté à votre liste ✅');
+      } else {
+        list = list.filter(item => item !== title);
+        localStorage.setItem('myList', JSON.stringify(list));
+        showNotif('Retiré de votre liste ❌');
+      }
+    }
+
+    function likeFilm() {
+      const title = document.getElementById('filmTitle').textContent;
+      let liked = JSON.parse(localStorage.getItem('likedFilms')) || [];
+      if (!liked.includes(title)) {
+        liked.push(title);
+        localStorage.setItem('likedFilms', JSON.stringify(liked));
+        showNotif('Merci pour le like ❤️');
+      } else {
+        liked = liked.filter(item => item !== title);
+        localStorage.setItem('likedFilms', JSON.stringify(liked));
+        showNotif('Like annulé 💔');
+      }
+    }
+
+    function moreInfo() {
+      document.getElementById('infoPopup').style.display = 'flex';
+    }
+
+    function closeInfoPopup() {
+      document.getElementById('infoPopup').style.display = 'none';
+    }
+  </script>
+
+</body>
+</html>
